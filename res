@@ -1,3 +1,4 @@
+hello
 Makefile
 a.out
 file
@@ -5,10 +6,8 @@ ft_printf
 infile.txt
 interdit
 libft
-lol
 main.c
 main2.c
-main3.c
 outfile.txt
 pipex
 pipex.h
