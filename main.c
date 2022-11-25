@@ -2,14 +2,21 @@
 
 int	main(int argc, char *argv[], char *envp[])
 {
-	int pid1;
-	int pid2;
-	int fd[2];
-	int	fdin;
-	int	fdout;
-	char **args1;
-	char **args2;
+	int		pid1;
+	int		pid2;
+	int		fd[2];
+	int		fdin;
+	int		fdout;
+	char	**args1;
+	char	**args2;
+	char	*path;
+	char	*exec_path;
 
+	if (argc != 5)
+	{
+		ft_dprintf(2, "usage: %s infile cmd1 cmd2 outfile\n", argv[0]);
+		exit(1);
+	}
 	if (pipe(fd))
 		return (1);
 	pid1 = fork();
@@ -21,19 +28,28 @@ int	main(int argc, char *argv[], char *envp[])
 		args1 = ft_split2(argv[2], " \t");
 		if (!args1)
 			exit(1);
-		char *path = px_find_command(args1[0]);
-		if (!path)
+		
+
+		path = 0;
+		if (px_ispath(args1[0]))
 		{
-			//print appropriate error message
-			cleanup_args(args1);
-			exit(1);
+			exec_path = args1[0];
 		}
+		else
+		{
+			path = px_find_command(args1[0], envp);
+			exec_path = path;
+		}
+
 		close(fd[0]);
 		dup2(fdin, STDIN_FILENO);
 		close(fdin);
 		dup2(fd[1], STDOUT_FILENO);
 		close(fd[1]);
-		execve(path, args1, envp);
+		
+		if (exec_path)
+			execve(exec_path, args1, envp);
+		
 		//print error message corresponding to errno
 		free(path);
 		cleanup_args(args1);
@@ -51,19 +67,26 @@ int	main(int argc, char *argv[], char *envp[])
 		args2 = ft_split2(argv[3], " \t");
 		if (!args2)
 			exit(1);
-		char *path = px_find_command(args2[0]);
-		if (!path)
+
+		path = 0;
+		if (px_ispath(args2[0]))
 		{
-			//print appropriate error message
-			cleanup_args(args2);
-			exit(1);
+			exec_path = args2[0];
 		}
+		else
+		{
+			path = px_find_command(args2[0], envp);
+			exec_path = path;
+		}
+
 		close(fd[1]); //close write end of pipe
 		dup2(fdout, STDOUT_FILENO);
 		close(fdout);
 		dup2(fd[0], STDIN_FILENO);
 		close(fd[0]);
-		execve(path, args2, envp);
+		
+		if (exec_path)
+			execve(path, args2, envp);
 		//an error occured
 		free(path);
 		cleanup_args(args2);
