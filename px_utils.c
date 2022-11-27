@@ -1,5 +1,12 @@
 #include "pipex.h"
 
+/*
+	extracts the path variable from the environment,
+	in the form of a null-terminated array of strings.
+	In case of malloc-failure, NULL is returned.
+	If the PATH variable isn't set the environment,
+	NULL is returned.
+*/
 static char	**px_getpath(char **envp)
 {
 	int		i;
@@ -18,11 +25,20 @@ static char	**px_getpath(char **envp)
 	return (0);
 }
 
+/*
+	returns true if a filename is actually a path,
+	that is, the string contains at least a slash ('/').
+*/
 int	px_ispath(const char *str)
 {
 	return (!!ft_strchr(str, '/'));
 }
 
+/*
+	combines the two strings into a new string path, heap-allocated.
+	the resulting string is a concatenation of the two, separated by
+	a slash ('/').
+*/
 static char	*px_path_combine(const char *path_1, const char *path_2)
 {
 	char	*res;
@@ -40,6 +56,14 @@ static char	*px_path_combine(const char *path_1, const char *path_2)
 	return (res);
 }
 
+/*
+	searches for a program with executable permissions in the path
+	variable specified.
+	If such a program is found, the absolute path, heap-allocated, is returned.
+	Else, 0 is returned, and errno is set to ENOENT is no such file exists,
+	or to EACCESS if such a file exists but the user doesn't have permission
+	to execute that file.
+*/
 static char	*px_search_path(const char *filename, char **path)
 {
 	char	*concat;
