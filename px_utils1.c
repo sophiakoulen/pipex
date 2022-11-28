@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   px_utils1.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/28 15:27:32 by skoulen           #+#    #+#             */
+/*   Updated: 2022/11/28 17:56:09 by skoulen          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 /*
@@ -64,33 +76,35 @@ static char	*px_path_combine(const char *path_1, const char *path_2)
 	or to EACCESS if such a file exists but the user doesn't have permission
 	to execute that file.
 */
-static char	*px_search_path(const char *filename, char **path)
+static char	*px_search_path(const char *filename, char **path, char **res)
 {
-	char	*concat;
 	int		i;
 	int		exist;
 
-	errno = 0;
 	exist = 0;
 	i = 0;
 	while (path[i])
 	{
-		concat = px_path_combine(path[i], filename);
-		if (!concat)
-			return (0);
-		if (access(concat, F_OK) == 0)
-			exist = 1;
-		if (access(concat, X_OK) == 0)
+		*res = px_path_combine(path[i], filename);
+		if (!*res)
 		{
-			errno = 0;
-			return (concat);
+			perror("malloc failure");
+			return (1);
 		}
-		free(concat);
+		if (access(*res, X_OK) == 0)
+			return (0);
+		if (errno == EACCES)
+			exist = 1;
+		free(*res);
 		i++;
 	}
 	if (exist)
-		errno = EACCES;
-	return (0);
+	{
+		ft_dprintf(2, "%s: Permission denied\n", filename);
+		return (126);
+	}
+	ft_dprintf(2, "%s: command not found\n", filename);
+	return (127);
 }
 
 /*
@@ -106,29 +120,34 @@ static char	*px_search_path(const char *filename, char **path)
 	if filename is not a path and such a command is found in the PATH,
 	res is set to the path to that command.
 */
-t_px_error	px_find_command(char *filename, char **envp, char **res)
+int	px_find_command(char *filename, char **envp, char **res)
 {
-	t_px_error	err;
+	int	res_code;
 
-	err = px_set_error(PX_SUCCESS);
 	if (px_ispath(filename))
 	{
 		if (access(filename, X_OK) == -1)
-			err = px_set_error(PX_SEE_ERRNO);
+		{
+			if (errno == ENOENT)
+				perror(filename);
+				return (127);
+			else if (errno == EACCES)
+				perror(filename);
+				return (126);
+			else
+				perror(filename);
+				return (1);
+		}
 		*res = ft_strdup(filename);
 		if (!*res)
-			err = px_set_error(PX_SEE_ERRNO);
+		{
+			perror("malloc error");
+			return (1);
+		}
 	}
 	else
 	{
-		*res = px_search_path(filename, px_getpath(envp));
-		if (!*res)
-		{
-			if (errno == ENOENT)
-				err = px_set_error(PX_CMD_NOT_FOUND);
-			else
-				err = px_set_error(PX_SEE_ERRNO);
-		}
+		return (px_search_path(filename, px_getpath(envp), res));
 	}
-	return (err);
+	return (0);
 }

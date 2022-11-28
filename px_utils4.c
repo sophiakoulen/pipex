@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   px_utils4.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/28 15:30:45 by skoulen           #+#    #+#             */
+/*   Updated: 2022/11/28 17:35:03 by skoulen          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 /*
@@ -6,17 +18,13 @@
 	strings.
 	In case of malloc failure, an error code is returned. 
 */
-t_px_error	px_split_command(char *str, char ***res)
+int	px_split_command(char *str, char ***res)
 {
-	t_px_error	err;
-
-	err.status = PX_SUCCESS;
 	*res = ft_split2(str, " \t");
 	if (!(*res))
 	{
-		err.status = PX_SEE_ERRNO;
-		err.errno_value = errno;
+		perror("malloc failure");
+		return (-1);
 	}
-	return (err);
+	return (0);
 }
-

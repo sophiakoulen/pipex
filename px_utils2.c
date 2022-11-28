@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   px_utils2.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/28 15:26:38 by skoulen           #+#    #+#             */
+/*   Updated: 2022/11/28 16:50:05 by skoulen          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
-extern char **environ;
+extern char	**environ;
 
 /*
 	dupplicates and closes the input and output file descriptors of the
@@ -17,7 +29,6 @@ static t_px_error	px_exec_io(t_command *program)
 	close(program->fdout);
 	if (execve(program->exec_path, program->args, environ) == -1)
 	{
-		//error message could be done immediately
 		return (px_set_error(PX_SEE_ERRNO));
 	}
 	return (px_set_error(PX_SEE_ERRNO));
@@ -31,7 +42,7 @@ static void	replace_process(t_command_list *cl, int **pipes, int index)
 	n = cl->size;
 	current_program = cl->arr + index;
 	close_unused_pipe_ends(pipes, index, n);
-	if (prepare_program(current_program, pipes, index, n).status != PX_SUCCESS)
+	if (prepare_program(cl, pipes, index, n).status != PX_SUCCESS)
 	{
 		cleanup_command_list(cl);
 		close_used_pipe_ends(pipes, index, n);
@@ -76,4 +87,3 @@ void	launch_child(t_command_list	*cl, int **pipes, int index)
 		replace_process(cl, pipes, index);
 	}
 }
-

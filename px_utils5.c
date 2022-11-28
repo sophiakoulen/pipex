@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   px_utils5.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/28 15:31:12 by skoulen           #+#    #+#             */
+/*   Updated: 2022/11/28 17:39:08 by skoulen          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
-extern char **environ;
+extern char	**environ;
 
 /*
 	opens an input file corresponding to a program and sets the input file
@@ -48,7 +60,8 @@ static t_px_error	prepare_program_outfile(t_command *program)
 	input file and / or an output file
 
 */
-static t_px_error	prepare_program_io(t_command *program, int **pipes, int index, int n)
+static t_px_error	prepare_program_io(t_command *program,
+											int **pipes, int index, int n)
 {
 	t_px_error	err;
 
@@ -72,7 +85,13 @@ static t_px_error	prepare_program_io(t_command *program, int **pipes, int index,
 	return (err);
 }
 
-
+static	void	cleanup_after_program(t_command_list *cl,
+										int **pipes, int index, int n)
+{
+	cleanup_command_list(cl);
+	close_used_pipe_ends(pipes, index, n);
+	cleanup_pipes(pipes, n);
+}
 
 /*
 	performs several operations on the program structure.
@@ -83,26 +102,29 @@ static t_px_error	prepare_program_io(t_command *program, int **pipes, int index,
 
 	In case of failure, just return the error code
 */
-t_px_error	prepare_program(t_command *program, int **pipes, int index, int n)
+void	prepare_program(t_command_list *cl, int **pipes, int index, int n)
 {
-	t_px_error	err;
+	t_command	*program;
+	int			res_code;
 
-	err = prepare_program_io(program, pipes, index, n);
-	if (err.status != PX_SUCCESS)
+	program = cl->arr + index;
+	
+	if (prepare_program_io(program, pipes, index, n).status != PX_SUCCESS)
 	{
-		return (err);
+		cleanup_after_program(cl, pipes, index, n);
+		exit(1);
 	}
-	err = px_split_command(program->raw_string, &program->args);
-	if (err.status != PX_SUCCESS)
+	
+	if (px_split_command(program->raw_string, &program->args) != 0)
 	{
-		px_print_error(program->raw_string, err);
-		return (err);
+		cleanup_after_program(cl, pipes, index, n);
+		exit(1);
 	}
-	err = px_find_command(program->args[0], environ, &program->exec_path);
-	if (err.status != PX_SUCCESS)
+	
+	res_code = px_find_command(program->args[0], environ, &program->exec_path);
+	if (res_code != 0)
 	{
-		px_print_error(program->args[0], err);
-		return (err);
+		cleanup_after_program(cl, pipes, index, n);
+		exit(res_code);
 	}
-	return (px_set_error(PX_SUCCESS));
 }

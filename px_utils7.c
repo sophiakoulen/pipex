@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   px_utils7.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/28 15:37:17 by skoulen           #+#    #+#             */
+/*   Updated: 2022/11/28 15:37:29 by skoulen          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 /*
@@ -44,6 +56,7 @@ void	cleanup_pipes_halfway(int **pipes, int n)
 	}
 	free(pipes);
 }
+
 /*
 	n is the number of programs to run.
 	So there are n - 1 pipes.

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipex.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/28 15:40:13 by skoulen           #+#    #+#             */
+/*   Updated: 2022/11/28 17:00:10 by skoulen          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PIPEX_H
 # define PIPEX_H
 
@@ -15,7 +27,7 @@
 typedef struct s_px_error
 {
 	int	status;
-	int errno_value;
+	int	errno_value;
 }	t_px_error;
 
 typedef struct s_command
@@ -28,13 +40,13 @@ typedef struct s_command
 	int		fdin;
 	int		fdout;
 	int		pid;
-} t_command;
+}	t_command;
 
-typedef	struct s_command_list
+typedef struct s_command_list
 {
 	int			size;
 	t_command	*arr;
-} t_command_list;
+}	t_command_list;
 
 # define PX_SUCCESS	0
 # define PX_CMD_NOT_FOUND 1
@@ -61,7 +73,7 @@ int			px_exit_status(int status);
 t_px_error	px_split_command(char *str, char ***res);
 
 /* utils 5 */
-t_px_error	prepare_program(t_command *program, int **pipes, int index, int n);
+t_px_error	prepare_program(t_command_list *cl, int **pipes, int index, int n);
 
 /* utils 6 */
 t_px_error	open_pipes(int **pipes, int n);

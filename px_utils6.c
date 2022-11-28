@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   px_utils6.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/28 15:36:03 by skoulen           #+#    #+#             */
+/*   Updated: 2022/11/28 15:36:53 by skoulen          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 /*
@@ -28,7 +40,6 @@ t_px_error	open_pipes(int **pipes, int n)
 	return (px_set_error(PX_SUCCESS));
 }
 
-
 /*
 	closes the the pipe ends that are not used by the process corresponding to the index,
 	that is, all the pipe ends except the write end of pipe[index] and the read end
@@ -39,10 +50,10 @@ void	close_unused_pipe_ends(int **pipes, int index, int n)
 	int	i;
 
 	i = 0;
-	while (i < n - 1) //there are n programs, n - 1 pipes
+	while (i < n - 1)
 	{
 		if (i > index || i < index)
-			close(pipes[i][1]); //close write end of pipe
+			close(pipes[i][1]);
 		if (i > index - 1 || index < index - 1)
 			close(pipes[i][0]);
 		i++;
@@ -73,7 +84,7 @@ void	close_used_pipe_ends(int **pipes, int index, int n)
 */
 void	close_pipes(int **pipes, int n)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < n - 1)
@@ -83,7 +94,6 @@ void	close_pipes(int **pipes, int n)
 		i++;
 	}
 }
-
 
 /*
 	Allocate exactly enough memory for the amount of pipes we need,

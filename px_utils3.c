@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   px_utils3.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/11/28 15:28:49 by skoulen           #+#    #+#             */
+/*   Updated: 2022/11/28 17:11:13 by skoulen          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 /*
@@ -30,7 +42,7 @@ void	launch_all_children(t_command_list *cl, int **pipes)
 /*
 	waits for all children and returns status of last process to finish
 */
-int wait_for_all_children(void)
+int	wait_for_all_children(void)
 {
 	int	status;
 
@@ -38,7 +50,6 @@ int wait_for_all_children(void)
 		;
 	return (status);
 }
-
 
 /*
 	counts the arguments,
@@ -49,24 +60,19 @@ int wait_for_all_children(void)
 */
 t_px_error	px_parse_args(int argc, char **argv, t_command_list *cl)
 {
-	t_px_error	err;
 	int			i;
 
 	if (argc < 5)
 	{
-		err = px_set_error(PX_WRONG_USAGE);
-		px_print_error(argv[0], err);
-		return (err);
+		px_print_error(argv[0], px_set_error(PX_WRONG_USAGE));
+		return (px_set_error(PX_WRONG_USAGE));
 	}
-
 	cl->size = argc - 3;
 	cl->arr = malloc(sizeof(*(cl->arr)) * cl->size);
-	
 	if (!cl->arr)
 	{
-		err = px_set_error(PX_SEE_ERRNO);
-		px_print_error("malloc error", err);
-		return (err);
+		px_print_error("malloc error", px_set_error(PX_SEE_ERRNO));
+		return (px_set_error(PX_SEE_ERRNO));
 	}
 	i = 0;
 	while (i < cl->size)
@@ -75,35 +81,24 @@ t_px_error	px_parse_args(int argc, char **argv, t_command_list *cl)
 		cl->arr[i].raw_string = argv[i + 2];
 		i++;
 	}
-
 	cl->arr[0].infile = argv[1];
 	cl->arr[cl->size - 1].outfile = argv[argc - 1];
-	/*testing code */
-	/*
-	ft_dprintf(2, "cmd count: %d\n", cl->size);
-	for (int i = 0; i < cl->size; i++)
-	{
-		ft_dprintf(2, "infile: %s, outfile: %s, raw_string: %s\n", cl->arr[i].infile, cl->arr[i].outfile, cl->arr[i].raw_string);
-	}
-	*/
-	/*end testing code*/
 	return (px_set_error(PX_SUCCESS));
 }
-
 
 /*
 	computes the appropriate exit status,
 	using the exit status of the last child
 */
-int px_exit_status(int status)
+int	px_exit_status(int status)
 {
-	int exit_code;
-	int term_signal;
+	int	exit_code;
+	int	term_signal;
 
 	if (WIFEXITED(status))
 	{
 		exit_code = WEXITSTATUS(status);
-		return (!!exit_code);
+		return (exit_code);
 	}
 	else
 	{
