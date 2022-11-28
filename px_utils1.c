@@ -93,6 +93,19 @@ static char	*px_search_path(const char *filename, char **path)
 	return (0);
 }
 
+/*
+	Finds a specified command and sets a heap-allocated string containing
+	the absolute path to the program.
+	
+	res is set to 0 if no such file with executable permissions is found,
+	and an appropriate error code is returned.
+
+	if filename is a path and the path is executable, the filename is
+	duplicated in res.
+
+	if filename is not a path and such a command is found in the PATH,
+	res is set to the path to that command.
+*/
 t_px_error	px_find_command(char *filename, char **envp, char **res)
 {
 	t_px_error	err;
@@ -117,78 +130,5 @@ t_px_error	px_find_command(char *filename, char **envp, char **res)
 				err = px_set_error(PX_SEE_ERRNO);
 		}
 	}
-	return (err);
-}
-
-t_px_error	px_split_command(char *str, char ***res)
-{
-	char		**res;
-	t_px_error	err;
-
-	err.status = PX_SUCCESS;
-	*res = ft_split2(str, " \t");
-	if (!(*res))
-	{
-		err.status = PX_SEE_ERRNO;
-		err.errno_value = errno;
-	}
-	return (err);
-}
-
-t_px_error	px_open(char *filename, int iswrite, int *fd)
-{
-	t_px_error	err;
-
-	err.status = PX_SUCCESS;
-	if (iswrite)
-		*fd = open(filename, O_WRONLY | O_CREAT, 0644);
-	else
-		*fd = open(filename, O_RDONLY);
-	if (*fd < 0)
-	{
-		err.status = PX_SEE_ERRNO;
-		err.errno_value = errno;
-	}
-	return (err);
-}
-
-t_px_error	px_fork(int *ret)
-{
-	t_px_error	err;
-	int			pid;
-
-	err.status = PX_SUCCESS;
-	pid = fork();
-	if (pid == -1)
-	{
-		err.status = PX_SEE_ERRNO;
-		err.errno_value = errno;
-	}
-	*ret = pid;
-	return (err);
-}
-
-t_px_error	px_pipe(int fd[2])
-{
-	t_px_error	err;
-	int			ret;
-
-	err.status = PX_SUCCESS;
-	ret = pipe(fd);
-	if (ret == -1)
-	{
-		err.status = PX_SEE_ERRNO;
-		err.errno_value = errno;
-	}
-	return (err);
-}
-
-t_px_error	px_set_error(int status)
-{
-	t_px_error	err;
-
-	err.status = status;
-	if (err.status == PX_SEE_ERRNO)
-		err.errno_value = errno;
 	return (err);
 }

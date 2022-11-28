@@ -1,10 +1,17 @@
 CC = gcc
-CFLAGS = -Wall -Wextra
+CFLAGS = -Wall -Wextra -g3 -fsanitize=address
 
 NAME = pipex
 
 SRCS = main.c \
-px_utils.c
+px_utils1.c \
+px_utils2.c \
+px_utils3.c \
+px_utils4.c \
+px_utils5.c \
+px_utils6.c \
+px_utils7.c \
+px_utils8.c
 
 all: $(NAME)
 
