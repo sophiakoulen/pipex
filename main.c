@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:16:59 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/28 15:26:18 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/29 12:38:44 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,16 +41,16 @@ int	main(int argc, char *argv[])
 	int				status;
 	t_command_list	cl;
 
-	if (px_parse_args(argc, argv, &cl).status != PX_SUCCESS)
+	if (px_parse_args(argc, argv, &cl) != 0)
 	{
 		exit(EXIT_FAILURE);
 	}
-	if (allocate_pipes(&pipes, cl.size).status != PX_SUCCESS)
+	if (allocate_pipes(&pipes, cl.size) != 0)
 	{
 		cleanup_command_list(&cl);
 		exit(EXIT_FAILURE);
 	}
-	if (open_pipes(pipes, cl.size).status != PX_SUCCESS)
+	if (open_pipes(pipes, cl.size) != 0)
 	{
 		cleanup_pipes(pipes, cl.size);
 		cleanup_command_list(&cl);

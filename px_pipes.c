@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   px_utils6.c                                        :+:      :+:    :+:   */
+/*   px_pipes.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:36:03 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/28 15:36:53 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/29 12:43:56 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 	Should we immediately free the pipes if there is an error or
 	let the calling process handle it????
 */
-t_px_error	open_pipes(int **pipes, int n)
+int	open_pipes(int **pipes, int n)
 {
 	int	i;
 
@@ -33,15 +33,16 @@ t_px_error	open_pipes(int **pipes, int n)
 		if (pipe(pipes[i]) == -1)
 		{
 			perror("error while opening pipes");
-			return (px_set_error(PX_SEE_ERRNO));
+			return (1);
 		}
 		i++;
 	}
-	return (px_set_error(PX_SUCCESS));
+	return (0);
 }
 
 /*
-	closes the the pipe ends that are not used by the process corresponding to the index,
+	closes the the pipe ends that are not used by the process corresponding
+	to the index,
 	that is, all the pipe ends except the write end of pipe[index] and the read end
 	of pipe[index - 1]
 */
@@ -103,17 +104,15 @@ void	close_pipes(int **pipes, int n)
 	we print an error message, cleanup the array of pipes and
 	return with an error code.
 */
-t_px_error	allocate_pipes(int ***pipes, int n)
+int	allocate_pipes(int ***pipes, int n)
 {
 	int			i;
-	t_px_error	err;
 
-	err = px_set_error(PX_SUCCESS);
 	*pipes = malloc(sizeof(**pipes) * (n - 1));
 	if (!*pipes)
 	{
 		perror("malloc error");
-		return (px_set_error(PX_SEE_ERRNO));
+		return (1);
 	}
 	i = 0;
 	while (i < (n - 1))
@@ -123,9 +122,9 @@ t_px_error	allocate_pipes(int ***pipes, int n)
 		{
 			cleanup_pipes_halfway((*pipes), i);
 			perror("malloc error");
-			return (px_set_error(PX_SEE_ERRNO));
+			return (1);
 		}
 		i++;
 	}
-	return (px_set_error(PX_SUCCESS));
+	return (0);
 }

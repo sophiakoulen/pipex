@@ -4,14 +4,13 @@ CFLAGS = -Wall -Wextra -g3 -fsanitize=address
 NAME = pipex
 
 SRCS = main.c \
-px_utils1.c \
-px_utils2.c \
-px_utils3.c \
-px_utils4.c \
-px_utils5.c \
-px_utils6.c \
-px_utils7.c \
-px_utils8.c
+px_cleanup.c \
+px_cmd_finder.c \
+px_cmd_prepare.c \
+px_launcher.c \
+px_main_funcs.c \
+px_pipes.c \
+px_splitter.c
 
 all: $(NAME)
 

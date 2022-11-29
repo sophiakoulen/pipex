@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   px_utils2.c                                        :+:      :+:    :+:   */
+/*   px_launcher.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:26:38 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/28 16:50:05 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/29 12:41:32 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ extern char	**environ;
 	Then, execve is called.
 	If it fails, an error code is returned.
 */
-static t_px_error	px_exec_io(t_command *program)
+static int	px_exec_io(t_command *program)
 {
 	dup2(program->fdin, STDIN_FILENO);
 	close(program->fdin);
@@ -29,9 +29,9 @@ static t_px_error	px_exec_io(t_command *program)
 	close(program->fdout);
 	if (execve(program->exec_path, program->args, environ) == -1)
 	{
-		return (px_set_error(PX_SEE_ERRNO));
+		return (1);
 	}
-	return (px_set_error(PX_SEE_ERRNO));
+	return (0);
 }
 
 static void	replace_process(t_command_list *cl, int **pipes, int index)
@@ -41,15 +41,12 @@ static void	replace_process(t_command_list *cl, int **pipes, int index)
 
 	n = cl->size;
 	current_program = cl->arr + index;
+
 	close_unused_pipe_ends(pipes, index, n);
-	if (prepare_program(cl, pipes, index, n).status != PX_SUCCESS)
-	{
-		cleanup_command_list(cl);
-		close_used_pipe_ends(pipes, index, n);
-		cleanup_pipes(pipes, n);
-		exit(EXIT_FAILURE);
-	}
-	if (px_exec_io(current_program).status != PX_SUCCESS)
+	
+	prepare_program(cl, pipes, index, n);
+	
+	if (px_exec_io(current_program) != 0)
 	{
 		cleanup_command_list(cl);
 		close_unused_pipe_ends(pipes, index, n);

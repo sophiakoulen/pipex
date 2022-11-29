@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   px_utils5.c                                        :+:      :+:    :+:   */
+/*   px_cmd_prepare.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:31:12 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/28 17:39:08 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/29 11:41:56 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,15 @@ extern char	**environ;
 	descriptor of the t_command structure accordingly.
 	If opening fails, an error message is printed and an error code is returned.
 */
-static t_px_error	prepare_program_infile(t_command *program)
+int	prepare_program_infile(t_command *program)
 {
-	t_px_error	err;
-
-	err = px_set_error(PX_SUCCESS);
 	program->fdin = open(program->infile, O_RDONLY);
 	if (program->fdin < 0)
 	{
-		err = px_set_error(PX_SEE_ERRNO);
-		px_print_error(program->infile, err);
+		perror(program->infile);
+		return (1);
 	}
-	return (err);
+	return (0);
 }
 
 /*
@@ -38,18 +35,15 @@ static t_px_error	prepare_program_infile(t_command *program)
 	descriptor of the t_command structure accordingly.
 	If opening fails, an error message is printed and an error code is returned.
 */
-static t_px_error	prepare_program_outfile(t_command *program)
+int	prepare_program_outfile(t_command *program)
 {
-	t_px_error	err;
-
-	err = px_set_error(PX_SUCCESS);
 	program->fdout = open(program->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (program->fdout < 0)
 	{
-		err = px_set_error(PX_SEE_ERRNO);
-		px_print_error(program->outfile, px_set_error(PX_SEE_ERRNO));
+		perror(program->outfile);
+		return (1);
 	}
-	return (err);
+	return (0);
 }
 
 /*
@@ -60,15 +54,12 @@ static t_px_error	prepare_program_outfile(t_command *program)
 	input file and / or an output file
 
 */
-static t_px_error	prepare_program_io(t_command *program,
-											int **pipes, int index, int n)
+int	prepare_program_io(t_command *program, int **pipes, int index, int n)
 {
-	t_px_error	err;
-
-	err = px_set_error(PX_SUCCESS);
 	if (index == 0)
 	{
-		err = prepare_program_infile(program);
+		if (prepare_program_infile(program) != 0)
+			return (1);
 	}
 	else
 	{
@@ -76,13 +67,14 @@ static t_px_error	prepare_program_io(t_command *program,
 	}
 	if (index == n - 1)
 	{
-		err = prepare_program_outfile(program);
+		if (prepare_program_outfile(program) != 0)
+			return (1);
 	}
 	else
 	{
 		program->fdout = pipes[index][1];
 	}
-	return (err);
+	return (0);
 }
 
 static	void	cleanup_after_program(t_command_list *cl,
@@ -109,7 +101,7 @@ void	prepare_program(t_command_list *cl, int **pipes, int index, int n)
 
 	program = cl->arr + index;
 	
-	if (prepare_program_io(program, pipes, index, n).status != PX_SUCCESS)
+	if (prepare_program_io(program, pipes, index, n) != 0)
 	{
 		cleanup_after_program(cl, pipes, index, n);
 		exit(1);
