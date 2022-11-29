@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:40:13 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/29 12:40:25 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/29 15:54:07 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,42 +56,42 @@ typedef struct s_command_list
 # define READ 0
 # define WRITE 1
 
-/* utils 1*/
+/* px_cmd_finder1 */
 int			px_find_command(char *filename, char **envp, char **res);
 
-/* utils 2*/
+/* px_cmd_finder2 */
+char		**px_getpath(char **envp);
+int			px_ispath(const char *str);
+char		*px_path_combine(const char *path_1, const char *path_2);
+int			px_check_abspath(char *abspath, char **res);
+
+/* px_launcher */
 void		launch_child(t_command_list	*cl, int **pipes, int index);
 
-/* utils 3*/
+/* px_launcher */
 void		launch_all_children(t_command_list *cl, int **pipes);
 int			wait_for_all_children(void);
 int			px_parse_args(int argc, char **argv, t_command_list *cl);
 int			px_exit_status(int status);
 
-/* utils 4 */
+/* px_splitter */
 int			px_split_command(char *str, char ***res);
 
-/* utils 5 */
+/* px_cmd_prepare */
 void		prepare_program(t_command_list *cl, int **pipes, int index, int n);
 
-/* utils 6 */
+/* px_pipes */
 int			open_pipes(int **pipes, int n);
 void		close_unused_pipe_ends(int **pipes, int index, int n);
 void		close_used_pipe_ends(int **pipes, int index, int n);
 void		close_pipes(int **pipes, int n);
 int			allocate_pipes(int ***pipes, int n);
 
-/* utils 7 */
+/* px_cleanup */
 void		cleanup_command(t_command *program);
 void		cleanup_command_list(t_command_list *cl);
 void		cleanup_pipes_halfway(int **pipes, int n);
 void		cleanup_pipes(int **pipes, int n);
 void		cleanup_args(char **tab);
-
-/* utils 8 */
-/*
-void		px_print_error(const char *str, t_px_error err);
-t_px_error	px_set_error(int status);
-*/
 
 #endif

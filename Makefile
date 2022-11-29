@@ -1,11 +1,12 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -g3 -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror
 
 NAME = pipex
 
 SRCS = main.c \
 px_cleanup.c \
 px_cmd_finder.c \
+px_cmd_finder2.c \
 px_cmd_prepare.c \
 px_launcher.c \
 px_main_funcs.c \

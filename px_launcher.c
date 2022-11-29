@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:26:38 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/29 12:41:32 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/29 15:59:13 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,8 @@ static void	replace_process(t_command_list *cl, int **pipes, int index)
 
 	n = cl->size;
 	current_program = cl->arr + index;
-
 	close_unused_pipe_ends(pipes, index, n);
-	
 	prepare_program(cl, pipes, index, n);
-	
 	if (px_exec_io(current_program) != 0)
 	{
 		cleanup_command_list(cl);

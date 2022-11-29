@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:28:49 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/29 12:16:11 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/29 16:11:19 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,7 @@ int	px_exit_status(int status)
 	}
 	else
 	{
+		ft_dprintf(2, "signal\n");
 		term_signal = WTERMSIG(status);
 		return (128 + term_signal);
 	}

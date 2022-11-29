@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:31:12 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/29 11:41:56 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/29 16:16:06 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,19 +100,16 @@ void	prepare_program(t_command_list *cl, int **pipes, int index, int n)
 	int			res_code;
 
 	program = cl->arr + index;
-	
 	if (prepare_program_io(program, pipes, index, n) != 0)
 	{
 		cleanup_after_program(cl, pipes, index, n);
 		exit(1);
 	}
-	
 	if (px_split_command(program->raw_string, &program->args) != 0)
 	{
 		cleanup_after_program(cl, pipes, index, n);
 		exit(1);
 	}
-	
 	res_code = px_find_command(program->args[0], environ, &program->exec_path);
 	if (res_code != 0)
 	{
