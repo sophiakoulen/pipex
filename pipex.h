@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:40:13 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/29 15:54:07 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/30 13:03:03 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,9 @@
 # include <sys/errno.h>
 # include <unistd.h>
 # include <sys/wait.h>
+
+# include <sys/types.h>
+# include <signal.h>
 
 # include "libft.h"
 # include "ft_printf.h"
@@ -70,7 +73,7 @@ void		launch_child(t_command_list	*cl, int **pipes, int index);
 
 /* px_launcher */
 void		launch_all_children(t_command_list *cl, int **pipes);
-int			wait_for_all_children(void);
+int			wait_for_all_children(t_command_list *cl);
 int			px_parse_args(int argc, char **argv, t_command_list *cl);
 int			px_exit_status(int status);
 

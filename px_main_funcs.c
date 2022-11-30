@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:28:49 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/29 16:11:19 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/30 14:09:03 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,17 @@ void	launch_all_children(t_command_list *cl, int **pipes)
 /*
 	waits for all children and returns status of last process to finish
 */
-int	wait_for_all_children(void)
+int	wait_for_all_children(t_command_list *cl)
 {
 	int	status;
+	int	i;
 
-	while (wait(&status) > 0)
-		;
+	i = 0;
+	while (i < cl->size)
+	{
+		waitpid(cl->arr[i].pid, &status, 0);
+		i++;
+	}	
 	return (status);
 }
 
@@ -64,7 +69,8 @@ int	px_parse_args(int argc, char **argv, t_command_list *cl)
 
 	if (argc < 5)
 	{
-		ft_dprintf(2, "usage: %s infile cmd1 cmd2 outfile\n", argv[0]);
+		ft_dprintf(2,
+			"usage: %s infile cmd1 cmd2 [cmd3 ...] outfile\n", argv[0]);
 		return (1);
 	}
 	cl->size = argc - 3;
@@ -102,7 +108,6 @@ int	px_exit_status(int status)
 	}
 	else
 	{
-		ft_dprintf(2, "signal\n");
 		term_signal = WTERMSIG(status);
 		return (128 + term_signal);
 	}

@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:16:59 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/29 12:38:44 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/30 13:02:25 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ int	main(int argc, char *argv[])
 	}
 	launch_all_children(&cl, pipes);
 	close_pipes(pipes, cl.size);
-	status = wait_for_all_children();
+	status = wait_for_all_children(&cl);
 	cleanup_pipes(pipes, cl.size);
 	cleanup_command_list(&cl);
 	return (px_exit_status(status));

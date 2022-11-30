@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:27:32 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/29 15:56:41 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/30 14:46:16 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,8 @@ static int	res_code(int errno_value)
 */
 int	px_find_command(char *filename, char **envp, char **res)
 {
-	int	errno_value;
+	int		errno_value;
+	char	**path_var;
 
 	if (px_ispath(filename))
 	{
@@ -119,7 +120,9 @@ int	px_find_command(char *filename, char **envp, char **res)
 	}
 	else
 	{
-		errno_value = px_check_allpaths(filename, px_getpath(envp), res);
+		path_var = px_getpath(envp);
+		errno_value = px_check_allpaths(filename, path_var, res);
+		cleanup_args(path_var);
 		error_printer_cmd(errno_value, filename);
 		return (res_code(errno_value));
 	}

@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:26:38 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/29 15:59:13 by skoulen          ###   ########.fr       */
+/*   Updated: 2022/11/30 14:46:38 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ static void	replace_process(t_command_list *cl, int **pipes, int index)
 	if (px_exec_io(current_program) != 0)
 	{
 		cleanup_command_list(cl);
-		close_unused_pipe_ends(pipes, index, n);
+		close_used_pipe_ends(pipes, index, n);
 		cleanup_pipes(pipes, n);
 		exit(EXIT_FAILURE);
 	}
@@ -62,11 +62,9 @@ static void	replace_process(t_command_list *cl, int **pipes, int index)
 */
 void	launch_child(t_command_list	*cl, int **pipes, int index)
 {
-	int			n;
 	t_command	*current_program;
 
 	current_program = &cl->arr[index];
-	n = cl->size;
 	current_program->pid = fork();
 	if (current_program->pid == -1)
 	{
@@ -74,6 +72,7 @@ void	launch_child(t_command_list	*cl, int **pipes, int index)
 		cleanup_command_list(cl);
 		close_pipes(pipes, cl->size);
 		cleanup_pipes(pipes, cl->size);
+		wait_for_all_children(cl);
 		exit(EXIT_FAILURE);
 	}
 	if (current_program->pid == 0)
