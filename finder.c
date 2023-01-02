@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   px_cmd_finder.c                                    :+:      :+:    :+:   */
+/*   finder.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:27:32 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/30 14:46:16 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/02 16:54:07 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ int	px_find_command(char *filename, char **envp, char **res)
 	{
 		path_var = px_getpath(envp);
 		errno_value = px_check_allpaths(filename, path_var, res);
-		cleanup_args(path_var);
+		cleanup_strs(path_var);
 		error_printer_cmd(errno_value, filename);
 		return (res_code(errno_value));
 	}

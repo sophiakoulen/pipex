@@ -4,14 +4,23 @@ CFLAGS = -Wall -Wextra -Werror
 NAME = pipex
 
 SRCS = main.c \
-px_cleanup.c \
-px_cmd_finder.c \
-px_cmd_finder2.c \
-px_cmd_prepare.c \
-px_launcher.c \
-px_main_funcs.c \
-px_pipes.c \
-px_splitter.c
+init.c \
+exec.c \
+exec_utils.c \
+finder.c \
+finder_utils.c \
+cleanup.c
+
+#DEBUG=1
+#FSAN=1
+
+ifdef DEBUG
+	CFLAGS += -g3
+endif
+
+ifdef FSAN
+	CFLAGS += -fsanitize=address
+endif
 
 all: $(NAME)
 
