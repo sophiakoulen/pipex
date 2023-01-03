@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 14:24:59 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/03 16:06:02 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/03 17:58:41 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ static int	init_cmds(t_pipex *p, char **argv)
 	i = 0;
 	while (i < p->n_cmds)
 	{
-		cmds[i] = ft_split2(argv[i + 2], " \t");
+		cmds[i] = split_cmd(argv[i + 2]);
 		if (!cmds[i])
 		{
 			perror(0);

@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:40:13 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/03 16:53:52 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/03 17:58:02 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,5 +63,8 @@ char	**px_getpath(char **envp);
 int		px_ispath(const char *str);
 char	*px_path_combine(const char *path_1, const char *path_2);
 int		px_check_abspath(char *abspath, char **res);
+
+/* command splitter */
+char	**split_cmd(char *str);
 
 #endif
