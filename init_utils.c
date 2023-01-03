@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 14:24:59 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/03 15:22:31 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/03 16:06:02 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,12 @@
 
 extern char	**environ;
 
+/*
+	Initialize input redirection and output redirection.
+
+	This means attempting to open the input and output files,
+	and saving the corresponding file descriptors in the pipex structure.
+*/
 int	init_redir(t_pipex *p, char **argv)
 {
 	int	input_fd;
@@ -36,59 +42,13 @@ int	init_redir(t_pipex *p, char **argv)
 	return (0);
 }
 
-static int	alloc_pipes(t_pipex *p)
-{
-	int	**pipes;
-	int	i;
+/*
+	Initialize the command+arguments lists.
 
-	pipes = ft_calloc(p->n_pipes, sizeof(*pipes));
-	if (!pipes)
-	{
-		perror(0);
-		return (-1);
-	}
-	i = 0;
-	while (i < p->n_pipes)
-	{
-		pipes[i] = malloc(2 * sizeof(int));
-		if (!pipes[i])
-		{
-			perror(0);
-			cleanup_pipes(p->n_pipes, pipes);
-			return (-1);
-		}
-		pipes[i][0] = -1;
-		pipes[i][1] = -1;
-		i++;
-	}
-	p->pipes = pipes;
-	return (0);
-}
-
-int	init_pipes(t_pipex *p)
-{
-	int	i;
-
-	if (alloc_pipes(p) == -1)
-	{
-		return (-1);
-	}
-	i = 0;
-	while (i < p->n_pipes)
-	{
-		if (pipe(p->pipes[i]) == -1)
-		{
-			perror(0);
-			close_all_fd(p);
-			cleanup_pipes(p->n_pipes, p->pipes);
-			return (-1);
-		}
-		i++;
-	}
-	return (0);
-}
-
-int	init_cmds(t_pipex *p, char **argv)
+	This means splitting each command from argv and saving
+	the result in the pipex structure. 
+*/
+static int	init_cmds(t_pipex *p, char **argv)
 {
 	char	***cmds;
 	int		i;
@@ -115,7 +75,16 @@ int	init_cmds(t_pipex *p, char **argv)
 	return (0);
 }
 
-int	init_paths(t_pipex *p)
+/*
+	Initialize the command paths.
+
+	This means, for each command, look for it in the
+	PATH variable if needed.
+	This step is skipped of the status of the command is not 0,
+	meaning, if there is a problem with the input or output
+	file associated with that command.
+*/
+static int	init_paths(t_pipex *p)
 {
 	char	**paths;
 	int		i;
@@ -137,4 +106,15 @@ int	init_paths(t_pipex *p)
 	}
 	p->paths = paths;
 	return (0);
+}
+
+/*
+	It is necessary to have accomplished the splitting of commands
+	before looking for each command in the PATH variable.
+*/
+int	init_cmds_and_paths(t_pipex *p, char **argv)
+{
+	if (init_cmds(p, argv) != 0)
+		return (-1);
+	return (init_paths(p));
 }

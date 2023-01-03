@@ -6,12 +6,18 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/02 14:08:56 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/03 15:24:04 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/03 16:18:40 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
+/*
+	Check if the number of arguments received is correct.
+
+	If so, we can deduce from it the number of commands we'll need
+	to execute and the number of pipes we'll need to open.
+*/
 static int	check_argc(t_pipex *p, int argc, char **argv)
 {
 	const char	*msg;
@@ -30,6 +36,13 @@ static int	check_argc(t_pipex *p, int argc, char **argv)
 	}
 }
 
+/*
+	Allocate an array to hold the process id's of the
+	child processes we'll launch for each command.
+
+	This will be used to wait for the child processes to finish
+	and retrieve the exit status of the last command.
+*/
 static int	init_pids(t_pipex *p)
 {
 	int	*pids;
@@ -44,6 +57,16 @@ static int	init_pids(t_pipex *p)
 	return (0);
 }
 
+/*
+	Allocate an array to hold the status of each command.
+
+	This will be the exit code of the child processes of each command.
+
+	This is also used to not look into PATH for a command if we've
+	already established that that file's input or output file has a problem,
+	and to not try to execute a command if we've already established that
+	the command could not be found in PATH.
+*/
 static int	init_statuses(t_pipex *p)
 {
 	int	*statuses;
@@ -72,21 +95,30 @@ static int	init_pipex(t_pipex *p)
 	return (0);
 }
 
+/*
+	Call all initialization functions to parse the arguments
+	and initialize the pipex structure.
+
+	If check_args or init_statuses fail, we cannot continue
+	executing the function.
+	
+	However, init_redir, init_pipes, init_cmds_and_paths and init_pids
+	are independent. If one of them fails, we need to cleanup
+	previously allocated memory.
+*/
 int	init(int argc, char **argv, t_pipex *p)
 {
 	int	error;
 
 	error = 0;
-	if (init_pipex(p) != 0)
-		return (-1);
+	init_pipex(p);
 	if (check_argc(p, argc, argv) != 0)
 		return (-1);
 	if (init_statuses(p) != 0)
 		return (-1);
 	error |= init_redir(p, argv) != 0;
 	error |= init_pipes(p) != 0;
-	error |= init_cmds(p, argv) != 0;
-	error |= init_paths(p) != 0;
+	error |= init_cmds_and_paths(p, argv) != 0;
 	error |= init_pids(p) != 0;
 	if (error)
 	{

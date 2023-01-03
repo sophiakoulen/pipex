@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:40:13 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/03 15:31:40 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/03 16:53:52 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,6 @@
 # include <sys/errno.h>
 # include <unistd.h>
 # include <sys/wait.h>
-
-# include <sys/types.h>
-# include <signal.h>
 
 # include "libft.h"
 # include "ft_printf.h"
@@ -44,8 +41,7 @@ typedef struct s_pipex
 int		init(int argc, char **argv, t_pipex *p);
 int		init_redir(t_pipex *p, char **argv);
 int		init_pipes(t_pipex *p);
-int		init_cmds(t_pipex *p, char **argv);
-int		init_paths(t_pipex *p);
+int		init_cmds_and_paths(t_pipex *p, char **argv);
 
 /* cleanup */
 void	cleanup_pipex(t_pipex *p);
@@ -57,7 +53,6 @@ void	cleanup_paths(int n, char **paths);
 /* execution */
 int		exec_pipeline(t_pipex *p);
 int		close_unused_fd(int i, t_pipex *p);
-int		close_used_fd(int i, t_pipex *p);
 int		close_all_fd(t_pipex *p);
 int		redirect(int i, t_pipex *p);
 int		compute_return_value(int status);
