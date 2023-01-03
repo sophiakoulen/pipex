@@ -41,3 +41,5 @@ fclean: clean
 	make fclean -C ft_printf LIBFT_PATH=../libft
 
 re: fclean all
+
+.PHONY: all clean fclean re
