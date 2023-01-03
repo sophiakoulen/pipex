@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/02 14:08:49 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/02 18:06:24 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/03 13:41:40 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,46 +14,66 @@
 
 extern char	**environ;
 
-int	exec_pipeline(int argc, t_pipex *p)
+static int	wait_all(t_pipex *p)
 {
-	int	n;
-	int	i;
 	int	status;
+	int	i;
 
-	n = argc - 3;
+	status = 0;
 	i = 0;
-	while (i < n)
-	{
-		p->pids[i] = fork();
-		dprintf(2, "%i is %s\n", p->pids[i], p->cmds[i][0]);
-		if (p->pids[i] == -1)
-		{
-			perror(0);
-			//EXIT
-			exit(EXIT_FAILURE);
-		}
-		if (p->pids[i] == 0) //in child process
-		{
-			close_unused_fd(i, n, p);
-			redirect(i, n, p);
-			if (p->statuses[i] == 0 && !is_broken(i, n, p))
-			{
-				execve(p->paths[i], p->cmds[i], environ);
-				perror(0);
-				p->statuses[i] = 1;
-			}
-			dprintf(2, "hello\n");
-			close(0);
-			close(1);
-			exit(p->statuses[i]);
-		}
-		i++;
-	}
-	i = 0;
-	while (i < n)
+	while (i < p->n_cmds)
 	{
 		waitpid(p->pids[i], &status, 0);
 		i++;
 	}
+	return (status);
+}
+
+static int	try_exec(int i, t_pipex *p)
+{
+	close_unused_fd(i, p);
+	redirect(i, p);
+	if (p->statuses[i] == 0)
+	{
+		if (execve(p->paths[i], p->cmds[i], environ) == -1)
+		{
+			perror("failed to execute program");
+			p->statuses[i] = 1;
+		}
+	}
+	close(0);
+	close(1);
+	exit(p->statuses[i]);
+}
+
+static int	launch_all(t_pipex *p)
+{
+	int	i;
+
+	i = 0;
+	while (i < p->n_cmds)
+	{
+		p->pids[i] = fork();
+		if (p->pids[i] == -1)
+		{
+			perror("forking failed");
+			return (1);
+		}
+		if (p->pids[i] == 0)
+		{
+			try_exec(i, p);
+		}
+		i++;
+	}
+	return (0);
+}
+
+int	exec_pipeline(t_pipex *p)
+{
+	int	status;
+
+	launch_all(p);
+	close_all_fd(p);
+	status = wait_all(p);
 	return (compute_return_value(status));
 }

@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/02 14:39:52 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/02 18:03:42 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/03 15:24:27 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,31 +14,27 @@
 /*
 	n is number of programs
 */
-int	close_unused_fd(int i, int n, t_pipex *p)
+int	close_unused_fd(int i, t_pipex *p)
 {
 	int	j;
 
 	if (i != 0)
 	{
-		dprintf(2, "%d closed file %d\n", getpid(), p->input_redir);
-		close(p->input_redir);
+		close(p->input_fd);
 	}
-	if (i != n - 1)
+	if (i != p->n_cmds - 1)
 	{
-		dprintf(2, "%d closed file %d\n", getpid(), p->output_redir);
-		close(p->output_redir);
+		close(p->output_fd);
 	}
 	j = 0;
-	while (j < n - 1)
+	while (j < p->n_pipes)
 	{
 		if (j != i)
 		{
-			dprintf(2, "%d closed pipe %d\n", getpid(), p->pipes[j][1]);
 			close(p->pipes[j][1]);
 		}
 		if (j != i - 1)
 		{
-			dprintf(2, "%d closed pipe %d\n", getpid(), p->pipes[j][0]);
 			close(p->pipes[j][0]);
 		}
 		j++;
@@ -46,45 +42,56 @@ int	close_unused_fd(int i, int n, t_pipex *p)
 	return (0);
 }
 
-int	close_used_fd(int i, int n, t_pipex *p)
+int	close_used_fd(int i, t_pipex *p)
 {
 	if (i == 0)
 	{
-		dprintf(2, "%d closed file %d\n", getpid(), p->input_redir);
-		close(p->input_redir);
+		close(p->input_fd);
 	}
 	else
 	{
-		dprintf(2, "%d closed pipe %d\n", getpid(), p->pipes[i - 1][0]);
 		close(p->pipes[i - 1][0]);
 	}
-	if (i == n - 1)
+	if (i == p->n_cmds - 1)
 	{
-		dprintf(2, "%d closed file %d\n", getpid(), p->output_redir);
-		close(p->output_redir);
+		close(p->output_fd);
 	}
 	else
 	{
-		dprintf(2, "%d closed pipe %d\n", getpid(), p->pipes[i][1]);
 		close(p->pipes[i][1]);
 	}
 	return (0);
 }
 
-int redirect(int i, int n, t_pipex *p)
+int	close_all_fd(t_pipex *p)
+{
+	int	i;
+
+	close(p->input_fd);
+	close(p->output_fd);
+	i = 0;
+	while (i < p->n_cmds - 1)
+	{
+		close(p->pipes[i][0]);
+		close(p->pipes[i][1]);
+		i++;
+	}
+	return (0);
+}
+
+int	redirect(int i, t_pipex *p)
 {
 	int	i_fd;
 	int	o_fd;
 
 	if (i == 0)
-		i_fd = p->input_redir;
+		i_fd = p->input_fd;
 	else
 		i_fd = p->pipes[i - 1][0];
-	if (i == n - 1)
-		o_fd = p->output_redir;
+	if (i == p->n_pipes)
+		o_fd = p->output_fd;
 	else
 		o_fd = p->pipes[i][1];
-	dprintf(2, "%i has io %i %i\n", getpid(), i_fd, o_fd);
 	dup2(i_fd, STDIN_FILENO);
 	close(i_fd);
 	dup2(o_fd, STDOUT_FILENO);
@@ -92,28 +99,7 @@ int redirect(int i, int n, t_pipex *p)
 	return (0);
 }
 
-int is_broken(int i, int n, t_pipex *p)
-{
-	if (i == 0)
-	{
-		if (p->input_redir < 0)
-		{
-			p->statuses[i] = 1;
-			return (1);
-		}
-	}
-	if (i == n - 1)
-	{
-		if (p->output_redir < 0)
-		{
-			p->statuses[i] = 1;
-			return (1);
-		}
-	}
-	return (0);
-}
-
-int compute_return_value(int status)
+int	compute_return_value(int status)
 {
 	int	exit_code;
 	int	term_signal;
