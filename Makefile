@@ -8,10 +8,10 @@ init.c init_utils.c init_pipes.c\
 exec.c exec_utils.c \
 finder.c finder_utils.c \
 cleanup.c cleanup_utils.c \
-splitter.c
+splitter.c splitter_utils.c
 
-#DEBUG=1
-#FSAN=1
+DEBUG=1
+FSAN=1
 
 ifdef DEBUG
 	CFLAGS += -g3

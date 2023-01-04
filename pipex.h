@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:40:13 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/03 17:58:02 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/04 14:45:51 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,13 @@
 
 # include "libft.h"
 # include "ft_printf.h"
+
+typedef struct s_parse_state
+{
+	int	squote;
+	int	dquote;
+	int	escaped;
+}	t_parse_state;
 
 typedef struct s_pipex
 {
@@ -66,5 +73,9 @@ int		px_check_abspath(char *abspath, char **res);
 
 /* command splitter */
 char	**split_cmd(char *str);
+char	*iter(char **ptr);
+char	*trim(char *str);
+int		word_len(char *str);
+int		next_word(char **str);
 
 #endif

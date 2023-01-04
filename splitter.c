@@ -6,73 +6,60 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 17:10:23 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/03 18:06:12 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/04 14:55:48 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static char	*trim(char *str)
+static char	*alloc_word(char *str)
 {
-	while (ft_isspace(*str))
-		str++;
-	return (str);
+	char	*word;
+	int		len;
+
+	str = trim(str);
+	len = word_len(str);
+	printf("len: %d\n", len);
+	if (len)
+	{
+		word = malloc((len + 1) * sizeof(*word));
+		return (word);
+	}
+	return (0);
 }
 
-static int	word_len(char *str)
+static void	fill_word(char *str, char *word)
 {
-	int	i;
-	int	squote;
-	int	dquote;
+	int		i;
+	char	*c;
 
-	squote = 0;
-	dquote = 0;
-	str = trim(str);
 	i = 0;
-	while (str[i])
+	while (1)
 	{
-		if (!squote && !dquote)
+		c = iter(&str);
+		if (!c)
 		{
-			if (ft_isspace(str[i]))
-				break ;
+			word[i] = 0;
+			break ;
 		}
-		if (str[i] == '\'')
-			squote = !squote;
-		else if (str[i] == '"')
-			dquote = !dquote;
+		else
+		{
+			word[i] = *c;
+		}
 		i++;
 	}
-	return (i);
 }
 
 static char	*get_word(char *str)
 {
-	int		len;
 	char	*word;
 
-	str = trim(str);
-	len = word_len(str);
-	if (len == 0)
-	{
+	word = alloc_word(str);
+	if (!word)
 		return (0);
-	}
-	else
-	{
-		word = ft_substr(str, 0, len);
-		return (word);
-	}
-}
-
-static int	next_word(char **str)
-{
-	int	len;
-
-	*str = trim(*str);
-	len = word_len(*str);
-	if (!len)
-		return (0);
-	*str += len;
-	return (1);
+	fill_word(str, word);
+	printf("word:%s|\n", word);
+	return (word);
 }
 
 static int	word_count(char *str)
@@ -80,8 +67,10 @@ static int	word_count(char *str)
 	char	*cpy;
 	int		i;
 
-	cpy = str;
-	i = 0;
+	cpy = trim(str);
+	if (!*cpy)
+		return (0);
+	i = 1;
 	while (next_word(&cpy))
 	{
 		i++;
@@ -95,7 +84,6 @@ char	**split_cmd(char *str)
 	int		wc;
 	int		i;
 
-	printf("str: %s\n", str);
 	wc = word_count(str);
 	words = ft_calloc(wc + 1, sizeof(*words));
 	if (!words)
