@@ -1,16 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   px_cmd_finder2.c                                   :+:      :+:    :+:   */
+/*   finder_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:48:50 by skoulen           #+#    #+#             */
-/*   Updated: 2022/11/29 15:56:51 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/05 16:56:07 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+char	*def_path = "/usr/bin:bin";
 
 /*
 	extracts the path variable from the environment,
@@ -24,7 +26,7 @@ char	**px_getpath(char **envp)
 	int		i;
 
 	if (!envp)
-		return (0);
+		return (ft_split(def_path, ':'));
 	i = 0;
 	while (envp[i])
 	{
@@ -34,7 +36,7 @@ char	**px_getpath(char **envp)
 		}
 		i++;
 	}
-	return (0);
+	return (ft_split(def_path, ':'));
 }
 
 /*
