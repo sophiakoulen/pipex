@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   finder.c                                           :+:      :+:    :+:   */
+/*   find_cmd.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:27:32 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 17:14:33 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 17:57:50 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,7 @@ static int	search_path(char **path, const char *filename, char **res)
 				return (errno);
 			
 			status = file_ok(concat, res);
+			free(concat);
 			if (status == 0) // executable file is found
 			{
 				return (0);
@@ -106,7 +107,6 @@ static int	search_path(char **path, const char *filename, char **res)
 			{
 				ret = status;
 			}
-			free(concat);
 			i++;
 		}
 	}
