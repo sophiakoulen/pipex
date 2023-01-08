@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 17:10:23 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 12:07:26 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 12:19:17 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,21 @@ static int	word_count(char *str)
 	return (i);
 }
 
+/*
+	Splits the string into multiple words, taking into account whitespace
+	and quotes and backslashes for escaping characters.
+
+	Return value is an array of strings ending with NULL allocated with
+	malloc, or NULL of an error occured.
+
+	Examples:
+		"hello world" => {"hello", "world", 0}
+		"	a 	a a a" => {"a", "a", "a", "a", 0}
+		"this\ is\ a\ test." => {"this is a test", 0}
+		""forty two"" => {"forty two", 0}
+		"'always writing' new' 'bugs" => {"always writing", "new bugs", 0}
+
+*/
 char	**split_cmd(char *str)
 {
 	char	**words;
