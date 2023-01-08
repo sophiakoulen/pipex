@@ -12,8 +12,8 @@ split_cmd.c split_cmd_utils.c)
 
 OBJS = $(SRCS:srcs/%.c=objs/%.o)
 
-DEBUG=1
-FSAN=1
+#DEBUG=1
+#FSAN=1
 
 ifdef DEBUG
 	CFLAGS += -g3
