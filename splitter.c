@@ -6,55 +6,14 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 17:10:23 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 12:19:17 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 13:30:35 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static char	*get_word(char *str)
-{
-	int		i;
-	char	*c;
-	int		len;
-	char	*word;
-
-	str = trim(str); //do i need trim?
-	len = word_len(str);
-	if (len)
-	{
-		word = malloc((len + 1) * sizeof(*word));
-		if (word)
-		{
-			i = 0;
-			while (i < len)
-			{
-				c = iter(&str);
-				word[i] = *c;
-				i++;
-			}
-			word[i] = 0;
-			return (word);
-		}
-	}
-	return (0);
-}
-
-static int	word_count(char *str)
-{
-	char	*cpy;
-	int		i;
-
-	cpy = trim(str);
-	if (!*cpy)
-		return (0);
-	i = 1;
-	while (next_word(&cpy))
-	{
-		i++;
-	}
-	return (i);
-}
+static char	*get_word(char *str);
+static int	word_count(char *str);
 
 /*
 	Splits the string into multiple words, taking into account whitespace
@@ -94,4 +53,46 @@ char	**split_cmd(char *str)
 		i++;
 	}
 	return (words);
+}
+
+static char	*get_word(char *str)
+{
+	int		i;
+	char	*c;
+	int		len;
+	char	*word;
+
+	str = trim(str); //do i need trim?
+	len = word_len(str);
+	if (len)
+	{
+		word = malloc((len + 1) * sizeof(*word));
+		if (word)
+		{
+			i = 0;
+			while (i < len)
+			{
+				c = iter(&str);
+				word[i] = *c;
+				i++;
+			}
+			word[i] = 0;
+			return (word);
+		}
+	}
+	return (0);
+}
+
+static int	word_count(char *str)
+{
+	char	*cpy;
+	int		i;
+
+	cpy = trim(str);
+	if (!*cpy)
+		return (0);
+	i = 1;
+	while (next_word(&cpy))
+		i++;
+	return (i);
 }
