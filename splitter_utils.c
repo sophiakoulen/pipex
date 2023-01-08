@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/04 14:41:01 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 13:56:00 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 14:24:08 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,8 @@ static int	is_end(char *str, t_parse_state s)
 		The next character of the word is [a] and we want to move the pointer
 		to the string [bc] to continue.
 
-		[""] needs to generate the word []:
-		The next character of the word is \0 and we do not need to move the
-		pointer.
+		[""] is an empty word:
+		0 is returned. ow we know we are at the end of the word.
 */
 char	*iter(char **ptr)
 {
@@ -88,10 +87,19 @@ int	word_len(char *str)
 	return (i);
 }
 
+/*
+	Moves the pointer to start of the next word to be processed.
+	Returns:
+		1 if there was a word to skip.
+		0 if there were no more words.
+*/
 int	next_word(char **str)
 {
 	*str = trim(*str);
+	if (!**str)
+		return (0);
 	while (iter(str))
 		;
-	return (!!**str);
+	*str = trim(*str);
+	return (1);
 }
