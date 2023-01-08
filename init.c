@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/02 14:08:56 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 15:04:59 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 17:08:33 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,8 @@ int	init(int argc, char **argv, t_pipex *p)
 	if (check_argc(p, argc, argv) != 0)
 		return (-1);
 	if (init_statuses(p) != 0)
+		return (-1);
+	if (init_path(p) != 0)
 		return (-1);
 	error |= init_redir(p, argv) != 0;
 	error |= init_pipes(p) != 0;
@@ -130,5 +132,6 @@ static int	init_pipex(t_pipex *p)
 	p->pipes = 0;
 	p->n_cmds = 0;
 	p->n_pipes = 0;
+	p->path = 0;
 	return (0);
 }

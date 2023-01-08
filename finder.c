@@ -6,16 +6,15 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:27:32 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 16:28:41 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 17:14:33 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static void	error_printer_cmd(int errno_value, char *str);
-static void	error_printer_abs(int errno_value, char *str);
-static int	px_check_allpaths(const char *filename, char **path, char **res);
-static int	res_code(int errno_value);
+static void	print_error(int errno_value, char *str);
+static int	search_path(char **path, const char *filename, char **res);
+static int	compute_status(int errno_value);
 
 /*
 	Finds a specified command and sets a heap-allocated string containing
@@ -33,62 +32,37 @@ static int	res_code(int errno_value);
 	This function prints the appropriate error message.
 
 */
-int	px_find_command(char *filename, char **envp, char **res)
+int	find_cmd(char **path, char *filename, char **res)
 {
-	int		errno_value;
-	char	**path_var;
+	int			errno_value;
 
 	//what if filename is null??
-
-	if (px_ispath(filename))
+	errno_value = ENOENT;
+	*res = 0;
+	if (*filename)
 	{
-		errno_value = px_check_abspath(filename, res);
-		error_printer_abs(errno_value, filename);
-		return (res_code(errno_value));
-	}
-	else
-	{
-		if (*filename)
+		if (has_slashes(filename))
 		{
-			path_var = px_getpath(envp);
-			errno_value = px_check_allpaths(filename, path_var, res);
-			cleanup_strs(path_var);
+			errno_value = file_ok(filename, res);
 		}
 		else
 		{
-			errno_value = ENOENT;
+			errno_value = search_path(path, filename, res);
 		}
-		error_printer_cmd(errno_value, filename);
-		return (res_code(errno_value));
 	}
-	return (0);
+	print_error(errno_value, filename);
+	return (compute_status(errno_value));
 }
 
-static void	error_printer_cmd(int errno_value, char *str)
+static void	print_error(int errno_value, char *str)
 {
-	if (errno_value == 0)
-	{
-		return ;
-	}
-	else if (errno_value == ENOENT)
+	if (errno_value == ENOENT && !has_slashes(str))
 	{
 		ft_dprintf(2, "%s: command not found\n", str);
 	}
-	else
+	else if (errno_value != 0)
 	{
-		ft_dprintf(2, "%s: %s\n", str, strerror(errno_value));
-	}
-}
-
-static void	error_printer_abs(int errno_value, char *str)
-{
-	if (errno_value == 0)
-	{
-		return ;
-	}
-	else
-	{
-		ft_dprintf(2, "%s: %s\n", str, strerror(errno_value));
+		perror(str);
 	}
 }
 
@@ -106,10 +80,10 @@ static void	error_printer_abs(int errno_value, char *str)
 	!!!! Error message may be innacurate if something
 	else is happening.
 */
-static int	px_check_allpaths(const char *filename, char **path, char **res)
+static int	search_path(char **path, const char *filename, char **res)
 {
 	int		i;
-	int		res_code;
+	int		status;
 	int		ret;
 	char	*concat;
 
@@ -123,13 +97,15 @@ static int	px_check_allpaths(const char *filename, char **path, char **res)
 			if (!concat)
 				return (errno);
 			
-			res_code = px_check_abspath(concat, res);
-			
-			if (res_code == 0)
+			status = file_ok(concat, res);
+			if (status == 0) // executable file is found
+			{
 				return (0);
-			if (res_code != ENOENT)
-				ret = res_code;
-
+			}
+			else if (status != ENOENT)
+			{
+				ret = status;
+			}
 			free(concat);
 			i++;
 		}
@@ -138,13 +114,13 @@ static int	px_check_allpaths(const char *filename, char **path, char **res)
 	return (ret);
 }
 
-static int	res_code(int errno_value)
+static int	compute_status(int errno_value)
 {
 	if (errno_value == 0)
 		return (0);
 	if (errno_value == ENOENT)
 		return (127);
 	if (errno_value == ENOMEM)
-		return (1);
+		return (2);
 	return (126);
 }

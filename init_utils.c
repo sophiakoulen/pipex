@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 14:24:59 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 15:02:26 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 17:06:42 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,15 @@ int	init_cmds_and_paths(t_pipex *p, char **argv)
 	if (init_cmds(p, argv) != 0)
 		return (-1);
 	return (init_paths(p));
+}
+
+/*
+	go extract the contents of PATH environment variable
+*/
+int	init_path(t_pipex *p)
+{
+	p->path = extract_path(environ);
+	return (0);
 }
 
 /*
@@ -114,7 +123,7 @@ static int	init_paths(t_pipex *p)
 	{
 		if (p->statuses[i] == 0)
 		{
-			p->statuses[i] = px_find_command(p->cmds[i][0], environ, &paths[i]);
+			p->statuses[i] = find_cmd(p->path, p->cmds[i][0], &paths[i]);
 		}
 		i++;
 	}

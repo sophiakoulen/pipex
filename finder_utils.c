@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:48:50 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 16:32:17 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 16:58:04 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 char	**extract_path(char **envp)
 {
 	int		i;
-	char	**default;
+	char	**default_path;
 
 	if (envp)
 	{
@@ -38,8 +38,8 @@ char	**extract_path(char **envp)
 			i++;
 		}
 	}
-	default = ft_split(DEFAULT_PATH, ':');
-	return (default);
+	default_path = ft_split(DEFAULT_PATH, ':');
+	return (default_path);
 }
 
 /*
@@ -89,11 +89,11 @@ char	*concat_slash(const char *str1, const char *str2)
 int	file_ok(char *filename, char **res)
 {
 	*res = 0;
-	if (access(file, X_OK) == -1)
+	if (access(filename, X_OK) == -1)
 	{
 		return (errno);
 	}
-	*res = ft_strdup(file);
+	*res = ft_strdup(filename);
 	if (!res)
 	{
 		return (errno);
