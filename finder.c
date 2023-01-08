@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:27:32 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 14:58:03 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 16:28:41 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,14 +119,17 @@ static int	px_check_allpaths(const char *filename, char **path, char **res)
 		i = 0;
 		while (path[i])
 		{
-			concat = px_path_combine(path[i], filename);
+			concat = concat_slash(path[i], filename);
 			if (!concat)
 				return (errno);
+			
 			res_code = px_check_abspath(concat, res);
+			
 			if (res_code == 0)
 				return (0);
 			if (res_code != ENOENT)
 				ret = res_code;
+
 			free(concat);
 			i++;
 		}

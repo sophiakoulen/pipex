@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:40:13 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 16:21:46 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 16:32:28 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ int		px_find_command(char *filename, char **envp, char **res);
 char	**extract_path(char **envp);
 int		has_slashes(const char *str);
 char	*concat_slash(const char *str1, const char *str2);
-int		px_check_abspath(char *abspath, char **res);
+int		file_ok(char *filename, char **res);
 
 /* command splitter */
 char	**split_cmd(char *str);

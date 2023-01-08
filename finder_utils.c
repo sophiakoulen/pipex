@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:48:50 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 16:25:08 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 16:32:17 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,24 +75,25 @@ char	*concat_slash(const char *str1, const char *str2)
 }
 
 /*
-	Checks whether we have access to an absolute path.
-	If file not exists, 127 is returned,
-	If file no permission, 126 is returned,
-	If malloc failure, 1 is returned.
-	If something else, 1 is returned.
-	In any case, ann error message is printed.
+	file_ok:
 
-	If OK, res is set to a heap-allocated duplicate of the path.
-	If NOT OK, res is set to 0.
+	Checks whether we have access to an absolute path.
+
+	If we have access:
+		res is set to a strdup of the filename,
+		0 is returned.
+	If we do not have access:
+		res is set to 0,
+		errno is returned.
 */
-int	px_check_abspath(char *abspath, char **res)
+int	file_ok(char *filename, char **res)
 {
 	*res = 0;
-	if (access(abspath, X_OK) == -1)
+	if (access(file, X_OK) == -1)
 	{
 		return (errno);
 	}
-	*res = ft_strdup(abspath);
+	*res = ft_strdup(file);
 	if (!res)
 	{
 		return (errno);
