@@ -6,11 +6,49 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/02 14:08:56 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/03 16:18:40 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 15:04:59 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+static int	check_argc(t_pipex *p, int argc, char **argv);
+static int	init_pids(t_pipex *p);
+static int	init_statuses(t_pipex *p);
+static int	init_pipex(t_pipex *p);
+
+/*
+	Call all initialization functions to parse the arguments
+	and initialize the pipex structure.
+
+	If check_args or init_statuses fail, we cannot continue
+	executing the function.
+	
+	However, init_redir, init_pipes, init_cmds_and_paths and init_pids
+	are independent. If one of them fails, we need to cleanup
+	previously allocated memory.
+*/
+int	init(int argc, char **argv, t_pipex *p)
+{
+	int	error;
+
+	error = 0;
+	init_pipex(p);
+	if (check_argc(p, argc, argv) != 0)
+		return (-1);
+	if (init_statuses(p) != 0)
+		return (-1);
+	error |= init_redir(p, argv) != 0;
+	error |= init_pipes(p) != 0;
+	error |= init_cmds_and_paths(p, argv) != 0;
+	error |= init_pids(p) != 0;
+	if (error)
+	{
+		cleanup_pipex(p);
+		return (-1);
+	}
+	return (0);
+}
 
 /*
 	Check if the number of arguments received is correct.
@@ -92,38 +130,5 @@ static int	init_pipex(t_pipex *p)
 	p->pipes = 0;
 	p->n_cmds = 0;
 	p->n_pipes = 0;
-	return (0);
-}
-
-/*
-	Call all initialization functions to parse the arguments
-	and initialize the pipex structure.
-
-	If check_args or init_statuses fail, we cannot continue
-	executing the function.
-	
-	However, init_redir, init_pipes, init_cmds_and_paths and init_pids
-	are independent. If one of them fails, we need to cleanup
-	previously allocated memory.
-*/
-int	init(int argc, char **argv, t_pipex *p)
-{
-	int	error;
-
-	error = 0;
-	init_pipex(p);
-	if (check_argc(p, argc, argv) != 0)
-		return (-1);
-	if (init_statuses(p) != 0)
-		return (-1);
-	error |= init_redir(p, argv) != 0;
-	error |= init_pipes(p) != 0;
-	error |= init_cmds_and_paths(p, argv) != 0;
-	error |= init_pids(p) != 0;
-	if (error)
-	{
-		cleanup_pipex(p);
-		return (-1);
-	}
 	return (0);
 }
