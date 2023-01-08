@@ -6,11 +6,63 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:27:32 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 14:39:49 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 14:58:03 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
+
+static void	error_printer_cmd(int errno_value, char *str);
+static void	error_printer_abs(int errno_value, char *str);
+static int	px_check_allpaths(const char *filename, char **path, char **res);
+static int	res_code(int errno_value);
+
+/*
+	Finds a specified command and sets a heap-allocated string containing
+	the absolute path to the program.
+	
+	res is set to 0 if no such file with executable permissions is found,
+	and an appropriate error code is returned.
+
+	if filename is a path and the path is executable, the filename is
+	duplicated in res.
+
+	if filename is not a path and such a command is found in the PATH,
+	res is set to the path to that command.
+
+	This function prints the appropriate error message.
+
+*/
+int	px_find_command(char *filename, char **envp, char **res)
+{
+	int		errno_value;
+	char	**path_var;
+
+	//what if filename is null??
+
+	if (px_ispath(filename))
+	{
+		errno_value = px_check_abspath(filename, res);
+		error_printer_abs(errno_value, filename);
+		return (res_code(errno_value));
+	}
+	else
+	{
+		if (*filename)
+		{
+			path_var = px_getpath(envp);
+			errno_value = px_check_allpaths(filename, path_var, res);
+			cleanup_strs(path_var);
+		}
+		else
+		{
+			errno_value = ENOENT;
+		}
+		error_printer_cmd(errno_value, filename);
+		return (res_code(errno_value));
+	}
+	return (0);
+}
 
 static void	error_printer_cmd(int errno_value, char *str)
 {
@@ -92,51 +144,4 @@ static int	res_code(int errno_value)
 	if (errno_value == ENOMEM)
 		return (1);
 	return (126);
-}
-
-/*
-	Finds a specified command and sets a heap-allocated string containing
-	the absolute path to the program.
-	
-	res is set to 0 if no such file with executable permissions is found,
-	and an appropriate error code is returned.
-
-	if filename is a path and the path is executable, the filename is
-	duplicated in res.
-
-	if filename is not a path and such a command is found in the PATH,
-	res is set to the path to that command.
-
-	This function prints the appropriate error message.
-
-*/
-int	px_find_command(char *filename, char **envp, char **res)
-{
-	int		errno_value;
-	char	**path_var;
-
-	//what if filename is null??
-
-	if (px_ispath(filename))
-	{
-		errno_value = px_check_abspath(filename, res);
-		error_printer_abs(errno_value, filename);
-		return (res_code(errno_value));
-	}
-	else
-	{
-		if (*filename)
-		{
-			path_var = px_getpath(envp);
-			errno_value = px_check_allpaths(filename, path_var, res);
-			cleanup_strs(path_var);
-		}
-		else
-		{
-			errno_value = ENOENT;
-		}
-		error_printer_cmd(errno_value, filename);
-		return (res_code(errno_value));
-	}
-	return (0);
 }
