@@ -6,13 +6,16 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 14:24:59 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 14:37:37 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 15:02:26 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
 extern char	**environ;
+
+static int	init_cmds(t_pipex *p, char **argv);
+static int	init_paths(t_pipex *p);
 
 /*
 	Initialize input redirection and output redirection.
@@ -40,6 +43,17 @@ int	init_redir(t_pipex *p, char **argv)
 	p->input_fd = input_fd;
 	p->output_fd = output_fd;
 	return (0);
+}
+
+/*
+	It is necessary to have accomplished the splitting of commands
+	before looking for each command in the PATH variable.
+*/
+int	init_cmds_and_paths(t_pipex *p, char **argv)
+{
+	if (init_cmds(p, argv) != 0)
+		return (-1);
+	return (init_paths(p));
 }
 
 /*
@@ -106,15 +120,4 @@ static int	init_paths(t_pipex *p)
 	}
 	p->paths = paths;
 	return (0);
-}
-
-/*
-	It is necessary to have accomplished the splitting of commands
-	before looking for each command in the PATH variable.
-*/
-int	init_cmds_and_paths(t_pipex *p, char **argv)
-{
-	if (init_cmds(p, argv) != 0)
-		return (-1);
-	return (init_paths(p));
 }
