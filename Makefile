@@ -34,6 +34,8 @@ ft_printf/libftprintf.a:
 $(NAME): $(OBJS) libft/libft.a ft_printf/libftprintf.a
 	$(CC) $(CFLAGS) $(OBJS) -o $@ -lft -lftprintf -Llibft -Lft_printf
 
+bonus: $(NAME)
+
 objs/%.o: srcs/%.c
 	mkdir -p objs
 	$(CC) $(CFLAGS) -I. -Ilibft -Ift_printf -c $< -o $@
