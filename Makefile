@@ -8,7 +8,7 @@ init.c init_utils.c init_pipes.c\
 exec.c exec_utils.c \
 find_cmd.c find_cmd_utils.c \
 cleanup.c cleanup_utils.c \
-splitter.c splitter_utils.c
+split_cmd.c split_cmd_utils.c
 
 OBJS = $(SRCS:.c=.o)
 
