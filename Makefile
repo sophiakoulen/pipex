@@ -10,6 +10,8 @@ finder.c finder_utils.c \
 cleanup.c cleanup_utils.c \
 splitter.c splitter_utils.c
 
+OBJS = $(SRCS:.c=.o)
+
 DEBUG=1
 FSAN=1
 
@@ -29,10 +31,14 @@ libft/libft.a:
 ft_printf/libftprintf.a:
 	make -C ft_printf LIBFT_PATH=../libft
 
-$(NAME): $(SRCS) libft/libft.a ft_printf/libftprintf.a
-	$(CC) $(CFLAGS) $(SRCS) -o $@ -lft -lftprintf -Ilibft -I. -Llibft -Ift_printf -Lft_printf
+$(NAME): $(OBJS) libft/libft.a ft_printf/libftprintf.a
+	$(CC) $(CFLAGS) $(OBJS) -o $@ -lft -lftprintf -Llibft -Lft_printf
+
+.c.o:
+	$(CC) $(CFLAGS) -I. -Ilibft -Ift_printf -c $<
 
 clean:
+	rm -f $(OBJS)
 	make clean -C libft
 	make clean -C ft_printf LIBFT_PATH=../libft
 
