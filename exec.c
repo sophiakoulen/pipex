@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/02 14:08:49 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/03 16:38:30 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 14:52:26 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,30 @@
 //the environ global variable contains the environment variables
 extern char	**environ;
 
+static int	wait_all(t_pipex *p);
+static int	try_exec(int i, t_pipex *p);
+static int	launch_all(t_pipex *p);
+
 /*
-	Wait for all launched processes to finish and
+	exec_pipeline:
+
+	- Launch all needed child processes.
+	- Close all opened file descriptors.
+	- Wait for all children to finish.
+	- Extract the exit code that needs to be returned.
+*/
+int	exec_pipeline(t_pipex *p)
+{
+	int	status;
+
+	launch_all(p);
+	close_all_fd(p);
+	status = wait_all(p);
+	return (compute_return_value(status));
+}
+
+/*
+	wait_all: Wait for all launched processes to finish and
 	return exit status of last command.
 */
 static int	wait_all(t_pipex *p)
@@ -35,7 +57,7 @@ static int	wait_all(t_pipex *p)
 }
 
 /*
-	Try executing the i-th command.
+	try_exec: Try executing the i-th command.
 
 	All unused pipe ends and file descriptors are closed.
 	(This is necessary, else other processes might wait for
@@ -68,15 +90,15 @@ static int	try_exec(int i, t_pipex *p)
 }
 
 /*
-	Spawn a child process for each command and try executing it.
+	launch_all: Spawn a child process for each command and try executing it.
 
 	This is done using fork().
 	If fork fails, the parent should not exit immediately, but instead wait
 	for the child processes to finish.
 	(Else, we might end up with zombie children.)
 
-	Note that a child process is launched even if we've already established that
-	there is a problem with the command.
+	Note that a child process is launched even if we've already established
+	that there is a problem with the command.
 	This seemed to me like a simple way to reproduce bash's behavior.
 */
 static int	launch_all(t_pipex *p)
@@ -99,20 +121,4 @@ static int	launch_all(t_pipex *p)
 		i++;
 	}
 	return (0);
-}
-
-/*
-	Launch all needed child processes.
-	Close all opened file descriptors.
-	Wait for all children to finish.
-	Extract the exit code that needs to be returned.
-*/
-int	exec_pipeline(t_pipex *p)
-{
-	int	status;
-
-	launch_all(p);
-	close_all_fd(p);
-	status = wait_all(p);
-	return (compute_return_value(status));
 }
