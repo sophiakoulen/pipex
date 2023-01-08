@@ -6,23 +6,16 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/04 14:41:01 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 14:24:08 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 15:15:25 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-static int	is_end(char *str, t_parse_state s)
-{
-	if (!*str)
-		return (1);
-	if ((ft_isspace(*str) && !s.squote && !s.dquote && !s.escaped))
-		return (1);
-	return (0);
-}
+static int	is_end(char *str, t_parse_state s);
 
 /*
-	Return the next character of the word, and moves to pointer to
+	iter: Return the next character of the word, and moves to pointer to
 	the next character to be processed.
 
 	Because of quoting and escaping, the next character of the word we
@@ -102,4 +95,13 @@ int	next_word(char **str)
 		;
 	*str = trim(*str);
 	return (1);
+}
+
+static int	is_end(char *str, t_parse_state s)
+{
+	if (!*str)
+		return (1);
+	if ((ft_isspace(*str) && !s.squote && !s.dquote && !s.escaped))
+		return (1);
+	return (0);
 }
