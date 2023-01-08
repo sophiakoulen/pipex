@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:40:13 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/04 14:45:51 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 16:21:46 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,9 @@
 
 # include "libft.h"
 # include "ft_printf.h"
+
+//the default value to use when PATH is not set
+# define DEFAULT_PATH "/usr/bin:bin"
 
 typedef struct s_parse_state
 {
@@ -66,9 +69,9 @@ int		compute_return_value(int status);
 
 /* command finder */
 int		px_find_command(char *filename, char **envp, char **res);
-char	**px_getpath(char **envp);
-int		px_ispath(const char *str);
-char	*px_path_combine(const char *path_1, const char *path_2);
+char	**extract_path(char **envp);
+int		has_slashes(const char *str);
+char	*concat_slash(const char *str1, const char *str2);
 int		px_check_abspath(char *abspath, char **res);
 
 /* command splitter */

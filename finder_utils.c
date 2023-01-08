@@ -6,67 +6,71 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 15:48:50 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/05 16:56:07 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 16:25:08 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*def_path = "/usr/bin:bin";
-
 /*
-	extracts the path variable from the environment,
+	extract_path:
+	
+	Extracts the path variable from the environment,
 	in the form of a null-terminated array of strings.
-	In case of malloc-failure, NULL is returned.
-	If the PATH variable isn't set the environment,
-	NULL is returned.
+	
+	If the PATH variable isn't set (not the same as empty),
+	a default value for the path is used.
 */
-char	**px_getpath(char **envp)
+char	**extract_path(char **envp)
 {
 	int		i;
+	char	**default;
 
-	if (!envp)
-		return (ft_split(def_path, ':'));
-	i = 0;
-	while (envp[i])
+	if (envp)
 	{
-		if (ft_strncmp("PATH=", envp[i], 5) == 0)
+		i = 0;
+		while (envp[i])
 		{
-			return (ft_split(envp[i] + 5, ':'));
+			if (ft_strncmp("PATH=", envp[i], 5) == 0)
+			{
+				return (ft_split(envp[i] + 5, ':'));
+			}
+			i++;
 		}
-		i++;
 	}
-	return (ft_split(def_path, ':'));
+	default = ft_split(DEFAULT_PATH, ':');
+	return (default);
 }
 
 /*
 	returns true if a filename is actually a path,
 	that is, the string contains at least a slash ('/').
 */
-int	px_ispath(const char *str)
+int	has_slashes(const char *str)
 {
 	return (!!ft_strchr(str, '/'));
 }
 
 /*
-	combines the two strings into a new string path, heap-allocated.
-	the resulting string is a concatenation of the two, separated by
-	a slash ('/').
+	concat_slash: Concatenates the two strings with a
+	'/' as a separator.
+
+	Returns 0 if one of them is an empty string. WTF??
 */
-char	*px_path_combine(const char *path_1, const char *path_2)
+char	*concat_slash(const char *str1, const char *str2)
 {
 	char	*res;
 	size_t	buffer_size;
 
-	if (*path_1 == '\0' || *path_2 == '\0')
-		return (0);
-	buffer_size = ft_strlen(path_1) + ft_strlen(path_2) + 2;
+	if (*str1 == '\0' || *str2 == '\0')
+		return (0); //why??
+	buffer_size = ft_strlen(str1) + ft_strlen(str2) + 2;
 	res = malloc(buffer_size);
 	if (!res)
 		return (0);
-	ft_strlcpy(res, path_1, buffer_size);
+	ft_strlcpy(res, str1, buffer_size);
 	ft_strlcat(res, "/", buffer_size);
-	ft_strlcat(res, path_2, buffer_size);
+	ft_strlcat(res, str2, buffer_size);
 	return (res);
 }
 
