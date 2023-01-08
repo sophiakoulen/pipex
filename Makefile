@@ -6,7 +6,7 @@ NAME = pipex
 SRCS = main.c \
 init.c init_utils.c init_pipes.c\
 exec.c exec_utils.c \
-finder.c finder_utils.c \
+find_cmd.c find_cmd_utils.c \
 cleanup.c cleanup_utils.c \
 splitter.c splitter_utils.c
 
