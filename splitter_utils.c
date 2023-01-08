@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/04 14:41:01 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/04 14:45:06 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/08 13:56:00 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,26 @@ static int	is_end(char *str, t_parse_state s)
 	return (0);
 }
 
+/*
+	Return the next character of the word, and moves to pointer to
+	the next character to be processed.
+
+	Because of quoting and escaping, the next character of the word we
+	are generating isn't necessarily the next character of the input string.
+
+	Examples:
+		[\'hello] needs to generate the word ['hello]:
+		The next character of the word is ['] and we want to move the pointer
+		to the string [hello] to continue processing the word.
+
+		[abc] needs to generate the word [abc]:
+		The next character of the word is [a] and we want to move the pointer
+		to the string [bc] to continue.
+
+		[""] needs to generate the word []:
+		The next character of the word is \0 and we do not need to move the
+		pointer.
+*/
 char	*iter(char **ptr)
 {
 	static t_parse_state	s = {0, 0, 0};
