@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/02 14:08:49 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 14:52:26 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/10 15:01:12 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ int	exec_pipeline(t_pipex *p)
 
 	launch_all(p);
 	close_all_fd(p);
+	if (p->heredoc)
+		heredoc(p);
 	status = wait_all(p);
 	return (compute_return_value(status));
 }

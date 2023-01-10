@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:40:13 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 17:13:39 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/10 14:07:17 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 
 # include "libft.h"
 # include "ft_printf.h"
+# include "get_next_line.h"
 
 //the default value to use when PATH is not set
 # define DEFAULT_PATH "/usr/bin:bin"
@@ -47,14 +48,19 @@ typedef struct s_pipex
 	int		n_cmds;
 	int		n_pipes;
 	char	**path;
+	int		heredoc;
+	char	**raw_list;
+	const char	*delim;
+	int		heredoc_pipe[2];
+	int		stdout;
 }	t_pipex;
 
 /* initialization */
 int		init(int argc, char **argv, t_pipex *p);
 int		init_path(t_pipex *p);
-int		init_redir(t_pipex *p, char **argv);
+int		init_redir(t_pipex *p);
 int		init_pipes(t_pipex *p);
-int		init_cmds_and_paths(t_pipex *p, char **argv);
+int		init_cmds_and_paths(t_pipex *p);
 
 /* cleanup */
 void	cleanup_pipex(t_pipex *p);
@@ -83,5 +89,9 @@ char	*iter(char **ptr);
 char	*trim(char *str);
 int		word_len(char *str);
 int		next_word(char **str);
+
+/* heredoc */
+void	heredoc(t_pipex *p);
+int	redirect_heredoc(t_pipex *p);
 
 #endif

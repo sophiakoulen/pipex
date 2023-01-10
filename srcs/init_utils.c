@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/03 14:24:59 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 17:06:42 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/10 15:13:45 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 extern char	**environ;
 
-static int	init_cmds(t_pipex *p, char **argv);
+static int	init_cmds(t_pipex *p);
 static int	init_paths(t_pipex *p);
 
 /*
@@ -23,25 +23,46 @@ static int	init_paths(t_pipex *p);
 	This means attempting to open the input and output files,
 	and saving the corresponding file descriptors in the pipex structure.
 */
-int	init_redir(t_pipex *p, char **argv)
+int	init_redir(t_pipex *p)
 {
-	int	input_fd;
-	int	output_fd;
+	char	*infile;
+	char	*outfile;
+	int		input_fd;
+	int		output_fd;
+	int		flags;
 
-	input_fd = open(argv[1], O_RDONLY);
-	if (input_fd < 0)
+	infile = p->raw_list[0];
+	outfile = p->raw_list[p->n_cmds + 1];
+
+	if (!p->heredoc)
 	{
-		perror(argv[1]);
-		p->statuses[0] = 1;
+		input_fd = open(infile, O_RDONLY);
+		if (input_fd < 0)
+		{
+			perror(infile);
+			p->statuses[0] = 1;
+		}
+		p->input_fd = input_fd;
 	}
-	output_fd = open(argv[p->n_cmds + 2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	else
+	{
+		p->input_fd = p->heredoc_pipe[0];
+		p->delim = infile;
+	}
+
+	flags = O_WRONLY | O_CREAT | O_TRUNC;
+	if (p->heredoc)
+		flags |= O_APPEND;
+	
+	output_fd = open(outfile, flags, 0644);
 	if (output_fd < 0)
 	{
-		perror(argv[p->n_cmds + 2]);
+		perror(outfile);
 		p->statuses[p->n_cmds - 1] = 1;
 	}
-	p->input_fd = input_fd;
+	
 	p->output_fd = output_fd;
+	
 	return (0);
 }
 
@@ -49,9 +70,9 @@ int	init_redir(t_pipex *p, char **argv)
 	It is necessary to have accomplished the splitting of commands
 	before looking for each command in the PATH variable.
 */
-int	init_cmds_and_paths(t_pipex *p, char **argv)
+int	init_cmds_and_paths(t_pipex *p)
 {
-	if (init_cmds(p, argv) != 0)
+	if (init_cmds(p) != 0)
 		return (-1);
 	return (init_paths(p));
 }
@@ -71,7 +92,7 @@ int	init_path(t_pipex *p)
 	This means splitting each command from argv and saving
 	the result in the pipex structure. 
 */
-static int	init_cmds(t_pipex *p, char **argv)
+static int	init_cmds(t_pipex *p)
 {
 	char	***cmds;
 	int		i;
@@ -85,7 +106,7 @@ static int	init_cmds(t_pipex *p, char **argv)
 	i = 0;
 	while (i < p->n_cmds)
 	{
-		cmds[i] = split_cmd(argv[i + 2]);
+		cmds[i] = split_cmd(p->raw_list[i + 1]);
 		if (!cmds[i])
 		{
 			perror(0); //didn't i already handle this?

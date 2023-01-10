@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/02 14:08:56 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/08 17:08:33 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/10 14:58:33 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,9 +40,11 @@ int	init(int argc, char **argv, t_pipex *p)
 		return (-1);
 	if (init_path(p) != 0)
 		return (-1);
-	error |= init_redir(p, argv) != 0;
+	if (p->heredoc)
+		redirect_heredoc(p);
+	error |= init_redir(p) != 0;
 	error |= init_pipes(p) != 0;
-	error |= init_cmds_and_paths(p, argv) != 0;
+	error |= init_cmds_and_paths(p) != 0;
 	error |= init_pids(p) != 0;
 	if (error)
 	{
@@ -62,18 +64,36 @@ static int	check_argc(t_pipex *p, int argc, char **argv)
 {
 	const char	*msg;
 
-	msg = "usage: %s infile cmd1 cmd2 [cmd3 ...] outfile\n";
+	msg = "usage: %s infile cmd1 cmd2 [cmd3 ...] outfile\n\
+	or\n%s here_doc DELIMITER cmd1 cmd2 [cmd3 ...] outfile\n";
 	if (argc < 5)
 	{
-		ft_dprintf(2, msg, argv[0]);
+		ft_dprintf(2, msg, argv[0], argv[0]);
 		return (-1);
+	}
+	if (ft_strncmp(argv[1], "here_doc", 9) == 0)
+	{
+		if (argc < 6)
+		{
+			ft_dprintf(2, msg, argv[0], argv[0]);
+			return (-1);
+		}
+		else
+		{
+			p->heredoc = 1;
+			p->n_cmds = argc - 4;
+			p->n_pipes = argc - 5;
+			p->raw_list = argv + 2;
+		}
 	}
 	else
 	{
+		p->heredoc = 0;
 		p->n_cmds = argc - 3;
 		p->n_pipes = argc - 4;
-		return (0);
+		p->raw_list = argv + 1;
 	}
+	return (0);
 }
 
 /*

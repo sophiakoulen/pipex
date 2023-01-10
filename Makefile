@@ -8,12 +8,13 @@ init.c init_utils.c init_pipes.c\
 exec.c exec_utils.c \
 find_cmd.c find_cmd_utils.c \
 cleanup.c cleanup_utils.c \
-split_cmd.c split_cmd_utils.c)
+split_cmd.c split_cmd_utils.c \
+heredoc.c )
 
 OBJS = $(SRCS:srcs/%.c=objs/%.o)
 
-#DEBUG=1
-#FSAN=1
+DEBUG=1
+FSAN=1
 
 ifdef DEBUG
 	CFLAGS += -g3
@@ -31,25 +32,30 @@ libft/libft.a:
 ft_printf/libftprintf.a:
 	make -C ft_printf LIBFT_PATH=../libft
 
-$(NAME): $(OBJS) libft/libft.a ft_printf/libftprintf.a
-	$(CC) $(CFLAGS) $(OBJS) -o $@ -lft -lftprintf -Llibft -Lft_printf
+libgnl/libgnl.a:
+	make -C libgnl
+
+$(NAME): $(OBJS) libft/libft.a ft_printf/libftprintf.a libgnl/libgnl.a
+	$(CC) $(CFLAGS) $(OBJS) -o $@ -lft -lftprintf -lgnl -Llibft -Lft_printf -Llibgnl
 
 bonus: $(NAME)
 
 objs/%.o: srcs/%.c
 	mkdir -p objs
-	$(CC) $(CFLAGS) -I. -Ilibft -Ift_printf -c $< -o $@
+	$(CC) $(CFLAGS) -I. -Ilibft -Ift_printf -Ilibgnl -c $< -o $@
 
 clean:
 	rm -f $(OBJS)
 	rm -rf objs
 	make clean -C libft
 	make clean -C ft_printf LIBFT_PATH=../libft
+	make clean -C libgnl
 
 fclean: clean
 	rm -f $(NAME)
 	make fclean -C libft
 	make fclean -C ft_printf LIBFT_PATH=../libft
+	make fclean -C libgnl
 
 re: fclean all
 
