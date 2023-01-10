@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/28 15:40:13 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/10 14:07:17 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/10 17:55:14 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,24 +35,33 @@ typedef struct s_parse_state
 	int	escaped;
 }	t_parse_state;
 
+typedef struct s_heredoc
+{
+	const char	*delim;
+	int			stdout_clone;
+	int			pipe[2];
+}	t_heredoc;
+
+typedef struct s_cmd
+{
+	int		status;
+	char	**args;
+	char	*full_path;
+	int		pid;
+}	t_cmd;
+
 //Careful! having paths and path variables, and of same type!!
 typedef struct s_pipex
 {
-	int		input_fd;
-	int		output_fd;
-	int		*statuses;
-	int		*pids;
-	char	***cmds;
-	char	**paths;
-	int		**pipes;
-	int		n_cmds;
-	int		n_pipes;
-	char	**path;
-	int		heredoc;
-	char	**raw_list;
-	const char	*delim;
-	int		heredoc_pipe[2];
-	int		stdout;
+	int			input_fd;
+	int			output_fd;
+	int			**pipes;
+	char		**path;
+	char		**raw_list;
+	int			n_cmds;
+	t_cmd		*cmds;
+	int			has_heredoc;
+	t_heredoc	*heredoc;
 }	t_pipex;
 
 /* initialization */

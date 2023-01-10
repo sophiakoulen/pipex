@@ -6,7 +6,7 @@
 /*   By: skoulen <skoulen@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/02 14:08:56 by skoulen           #+#    #+#             */
-/*   Updated: 2023/01/10 14:58:33 by skoulen          ###   ########.fr       */
+/*   Updated: 2023/01/10 17:59:37 by skoulen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,11 @@ int	init(int argc, char **argv, t_pipex *p)
 		return (-1);
 	if (init_path(p) != 0)
 		return (-1);
+
+	//ARGHHH
 	if (p->heredoc)
 		redirect_heredoc(p);
+	
 	error |= init_redir(p) != 0;
 	error |= init_pipes(p) != 0;
 	error |= init_cmds_and_paths(p) != 0;
