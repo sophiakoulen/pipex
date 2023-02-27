@@ -1,7 +1,7 @@
+NAME = pipex
+
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
-
-NAME = pipex
 
 SRCS = $(addprefix srcs/, main.c \
 init.c init_utils.c init_pipes.c\
@@ -12,16 +12,11 @@ split_cmd.c split_cmd_utils.c)
 
 OBJS = $(SRCS:srcs/%.c=objs/%.o)
 
-#DEBUG=1
-#FSAN=1
-
 ifdef DEBUG
-	CFLAGS += -g3
+	CFLAGS += -g3 -fsanitize=address
 endif
 
-ifdef FSAN
-	CFLAGS += -fsanitize=address
-endif
+INCLUDES_PATH = -I. -Ilibft/includes -Ift_printf
 
 all: $(NAME)
 
@@ -38,7 +33,7 @@ bonus: $(NAME)
 
 objs/%.o: srcs/%.c
 	mkdir -p objs
-	$(CC) $(CFLAGS) -I. -Ilibft -Ift_printf -c $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDES_PATH) -c $< -o $@
 
 clean:
 	rm -f $(OBJS)
